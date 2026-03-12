@@ -11,18 +11,24 @@ app.use(express.json());
 
 // PostgreSQL connection
 const pool = new Pool({
-    user: 'your_user',
-    host: 'localhost',
-    database: 'your_database',
-    password: 'your_password',
-    port: 5432,
+    user: process.env.DB_USER || 'gns_user',
+    password: process.env.DB_PASSWORD || 'gns_password',
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT) || 5432,
+    database: process.env.DB_NAME || 'gns_database',
+});
+
+// Attach pool to requests for use in route handlers
+app.use((req, res, next) => {
+    req.pool = pool;
+    next();
 });
 
 // JWT middleware
 const authenticateJWT = (req, res, next) => {
     const token = req.headers['authorization'];
     if (token) {
-        jwt.verify(token, 'your_jwt_secret', (err, user) => {
+        jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret', (err, user) => {
             if (err) {
                 return res.sendStatus(403);
             }
@@ -34,19 +40,24 @@ const authenticateJWT = (req, res, next) => {
     }
 };
 
-// Basic routes
-app.post('/authenticate', (req, res) => {
-    // Your authentication logic here
+// Import routes
+const usersRouter = require('./routes/users');
+const devicesRouter = require('./routes/devices');
+const gpsRouter = require('./routes/gps');
+
+// Use routes
+app.use('/api/users', usersRouter);
+app.use('/api/devices', devicesRouter);
+app.use('/api/gps', gpsRouter);
+
+// Health check
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok' });
 });
 
-app.get('/devices', authenticateJWT, (req, res) => {
-    // Logic for getting devices
+const PORT = parseInt(process.env.PORT) || 5000;
+app.listen(PORT, () => {
+    console.log(`GNS Backend running on port ${PORT}`);
 });
 
-app.post('/devices', authenticateJWT, (req, res) => {
-    // Logic for adding a new device
-});
-
-app.listen(3000, () => {
-    console.log('Server running on port 3000');
-});
+module.exports = app;

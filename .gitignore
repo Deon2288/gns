@@ -2,4 +2,6 @@ node_modules/
 .env.local
 .env*.local
 frontend/build/
+backend/node_modules/
+backend/.env
 

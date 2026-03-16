@@ -1,0 +1,63 @@
+.gns-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #0f172a;
+}
+
+/* ── Top nav bar ─────────────────────────────────────────────────────────── */
+.gns-nav {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: #1e293b;
+  border-bottom: 1px solid #334155;
+  padding: 0 16px;
+  height: 48px;
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+.gns-nav-brand {
+  font-weight: 700;
+  font-size: 16px;
+  color: #38bdf8;
+  letter-spacing: 0.05em;
+  margin-right: 24px;
+  user-select: none;
+}
+
+.gns-tab {
+  padding: 0 18px;
+  height: 48px;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 600;
+  border-bottom: 3px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.gns-tab:hover {
+  color: #f1f5f9;
+}
+
+.gns-tab.active {
+  color: #38bdf8;
+  border-bottom-color: #38bdf8;
+}
+
+/* ── Content area ────────────────────────────────────────────────────────── */
+.gns-content {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.gns-panel {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 24px;
+}

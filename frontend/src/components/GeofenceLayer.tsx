@@ -111,7 +111,7 @@ const GeofenceLayer: React.FC<GeofenceLayerProps> = ({ map, geofences, visible }
         }
 
         return () => {
-            if (!map || map._removed) return;
+            if (!map || (map as unknown as { _removed?: boolean })._removed) return;
             [LABEL_LAYER_ID, LINE_LAYER_ID, FILL_LAYER_ID].forEach((id) => {
                 if (map.getLayer(id)) map.removeLayer(id);
             });

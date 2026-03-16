@@ -108,8 +108,7 @@ const RouteAnimation: React.FC<RouteAnimationProps> = ({
 
         return () => {
             if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
-            if (!map || map._removed) return;
-            [DOT_LAYER, ROUTE_LAYER].forEach((id) => { if (map.getLayer(id)) map.removeLayer(id); });
+            if (!map || (map as unknown as { _removed?: boolean })._removed) return;
             [DOT_SOURCE, ROUTE_SOURCE].forEach((id) => { if (map.getSource(id)) map.removeSource(id); });
         };
     // eslint-disable-next-line react-hooks/exhaustive-deps

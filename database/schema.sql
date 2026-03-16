@@ -37,3 +37,19 @@ CREATE TABLE device_commands (
     executed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (device_id) REFERENCES devices(device_id)
 );
+
+CREATE TABLE alerts (
+    alert_id SERIAL PRIMARY KEY,
+    device_id INT NOT NULL,
+    alert_type VARCHAR(100) NOT NULL,
+    message TEXT NOT NULL,
+    severity VARCHAR(20) NOT NULL DEFAULT 'info',
+    acknowledged BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (device_id) REFERENCES devices(device_id)
+);
+
+-- Useful indexes
+CREATE INDEX idx_gps_data_device_time ON gps_data (device_id, timestamp DESC);
+CREATE INDEX idx_alerts_device        ON alerts (device_id);
+CREATE INDEX idx_telemetry_device_time ON telemetry (device_id, timestamp DESC);

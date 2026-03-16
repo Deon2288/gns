@@ -139,10 +139,13 @@ const MapContainer: React.FC = () => {
         });
 
         mapRef.current = map;
+        // Capture the markers map now so the cleanup closure doesn't
+        // reference the mutable ref value (react-hooks/exhaustive-deps).
+        const markers = markersRef.current;
 
         return () => {
-            markersRef.current.forEach((m) => m.remove());
-            markersRef.current.clear();
+            markers.forEach((m) => m.remove());
+            markers.clear();
             map.remove();
             mapRef.current = null;
             setMapInstance(null);

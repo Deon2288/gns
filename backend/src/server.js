@@ -3,12 +3,40 @@ const express = require('express');
 const cors = require('cors');
 const http = require('http');
 const WebSocket = require('ws');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 
 // ── Middleware ──────────────────────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
+
+// ── Rate limiting ────────────────────────────────────────────────────────────
+
+/** Strict limiter for authentication endpoints (register / login). */
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 20,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: 'Too many requests, please try again later.' },
+});
+
+/** General API limiter for all other routes. */
+const apiLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 200,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: 'Too many requests, please try again later.' },
+});
+
+// Apply strict limiter to auth endpoints
+app.use('/api/users/register', authLimiter);
+app.use('/api/users/login',    authLimiter);
+
+// Apply general limiter to all other /api routes
+app.use('/api', apiLimiter);
 
 // ── Routes ──────────────────────────────────────────────────────────────────
 app.use('/api/users',    require('./routes/users'));

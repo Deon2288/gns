@@ -83,8 +83,7 @@ const HeatmapLayer: React.FC<HeatmapLayerProps> = ({ map, points, visible }) => 
         }
 
         return () => {
-            if (!map || map._removed) return;
-            if (map.getLayer(LAYER_ID)) map.removeLayer(LAYER_ID);
+            if (!map || (map as unknown as { _removed?: boolean })._removed) return;
             if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
             initialised.current = false;
         };

@@ -3,6 +3,11 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const { Pool } = require('pg');
 
+const discoveryRouter = require('./routes/discovery');
+const devicesRouter = require('./routes/devices');
+const gpsRouter = require('./routes/gps');
+const usersRouter = require('./routes/users');
+
 const app = express();
 
 // Middleware
@@ -46,6 +51,12 @@ app.get('/devices', authenticateJWT, (req, res) => {
 app.post('/devices', authenticateJWT, (req, res) => {
     // Logic for adding a new device
 });
+
+// Mount routers
+app.use('/api', devicesRouter);
+app.use('/api', gpsRouter);
+app.use('/api', usersRouter);
+app.use('/api/discovery', discoveryRouter);
 
 app.listen(3000, () => {
     console.log('Server running on port 3000');

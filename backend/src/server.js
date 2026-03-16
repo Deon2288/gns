@@ -1,52 +1,73 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
-const { Pool } = require('pg');
+const http = require('http');
+const { Server } = require('socket.io');
+
+const usersRouter = require('./routes/users');
+const devicesRouter = require('./routes/devices');
+const gpsRouter = require('./routes/gps');
+const alertsRouter = require('./routes/alerts');
+const geofencesRouter = require('./routes/geofences');
+const tripsRouter = require('./routes/trips');
+const driversRouter = require('./routes/drivers');
+const analyticsRouter = require('./routes/analytics');
+const commandsRouter = require('./routes/commands');
 
 const app = express();
+const server = http.createServer(app);
 
-// Middleware
+// Socket.IO real-time layer
+const io = new Server(server, {
+  cors: { origin: '*', methods: ['GET', 'POST'] },
+});
+
+// Expose io instance for use in routes
+app.set('io', io);
+
 app.use(cors());
 app.use(express.json());
 
-// PostgreSQL connection
-const pool = new Pool({
-    user: 'your_user',
-    host: 'localhost',
-    database: 'your_database',
-    password: 'your_password',
-    port: 5432,
+// Health check
+app.get('/api/health', (_req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
+
+// API routes
+app.use('/api/users', usersRouter);
+app.use('/api/devices', devicesRouter);
+app.use('/api/gps', gpsRouter);
+app.use('/api/alerts', alertsRouter);
+app.use('/api/geofences', geofencesRouter);
+app.use('/api/trips', tripsRouter);
+app.use('/api/drivers', driversRouter);
+app.use('/api/analytics', analyticsRouter);
+app.use('/api/commands', commandsRouter);
+
+// WebSocket connection handling
+io.on('connection', (socket) => {
+  console.log('Client connected:', socket.id);
+
+  socket.on('subscribe_device', (deviceId) => {
+    socket.join(`device_${deviceId}`);
+  });
+
+  socket.on('unsubscribe_device', (deviceId) => {
+    socket.leave(`device_${deviceId}`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected:', socket.id);
+  });
 });
 
-// JWT middleware
-const authenticateJWT = (req, res, next) => {
-    const token = req.headers['authorization'];
-    if (token) {
-        jwt.verify(token, 'your_jwt_secret', (err, user) => {
-            if (err) {
-                return res.sendStatus(403);
-            }
-            req.user = user;
-            next();
-        });
-    } else {
-        res.sendStatus(401);
-    }
-};
-
-// Basic routes
-app.post('/authenticate', (req, res) => {
-    // Your authentication logic here
+// Global error handler
+app.use((err, _req, res, _next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Internal server error' });
 });
 
-app.get('/devices', authenticateJWT, (req, res) => {
-    // Logic for getting devices
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+  console.log(`GNS server running on port ${PORT}`);
 });
 
-app.post('/devices', authenticateJWT, (req, res) => {
-    // Logic for adding a new device
-});
-
-app.listen(3000, () => {
-    console.log('Server running on port 3000');
-});
+module.exports = { app, server, io };

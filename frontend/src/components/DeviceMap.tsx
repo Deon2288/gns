@@ -1,42 +1,103 @@
-import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import React, { useEffect, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { Device } from '../types';
 
-const DeviceMap: React.FC = () => {
-    const [devices, setDevices] = useState<any[]>([]);
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
 
-    // Mock function to fetch device GPS data
-    const fetchDevices = () => {
-        // Replace with real API call
-        return [
-            { id: 1, name: 'Device 1', lat: 51.505, lng: -0.09 },
-            { id: 2, name: 'Device 2', lat: 51.51, lng: -0.1 },
-            { id: 3, name: 'Device 3', lat: 51.51, lng: -0.12 },
-        ];
-    };
+const statusColor: Record<string, string> = {
+  online: '#22c55e',
+  idle: '#eab308',
+  offline: '#ef4444',
+};
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            const fetchedDevices = fetchDevices();
-            setDevices(fetchedDevices);
-        }, 5000); // Fetch every 5 seconds
+function createDeviceIcon(status: string) {
+  const color = statusColor[status] || '#6b7280';
+  return L.divIcon({
+    className: '',
+    html: `<div style="
+      width:14px;height:14px;border-radius:50%;
+      background:${color};border:2px solid #fff;
+      box-shadow:0 0 6px ${color};
+    "></div>`,
+    iconSize: [14, 14],
+    iconAnchor: [7, 7],
+    popupAnchor: [0, -10],
+  });
+}
 
-        return () => clearInterval(interval);
-    }, []);
+const FitBounds: React.FC<{ devices: Device[] }> = ({ devices }) => {
+  const map = useMap();
+  const fitted = useRef(false);
 
-    return (
-        <MapContainer center={[51.505, -0.09]} zoom={13} style={{ height: '100vh', width: '100%' }}>
-            <TileLayer
-                url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            />
-            {devices.map(device => (
-                <Marker key={device.id} position={[device.lat, device.lng]}>
-                    <Popup>{device.name}</Popup>
-                </Marker>
-            ))}
-        </MapContainer>
-    );
+  useEffect(() => {
+    const valid = devices.filter((d) => d.last_lat != null && d.last_lon != null);
+    if (valid.length > 0 && !fitted.current) {
+      const bounds = L.latLngBounds(valid.map((d) => [d.last_lat!, d.last_lon!]));
+      map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+      fitted.current = true;
+    }
+  }, [devices, map]);
+
+  return null;
+};
+
+interface DeviceMapProps {
+  devices: Device[];
+  selectedDevice?: Device | null;
+  onDeviceSelect?: (device: Device) => void;
+  height?: string;
+}
+
+const DeviceMap: React.FC<DeviceMapProps> = ({
+  devices,
+  selectedDevice,
+  onDeviceSelect,
+  height = '100%',
+}) => {
+  const validDevices = devices.filter((d) => d.last_lat != null && d.last_lon != null);
+
+  return (
+    <MapContainer
+      center={[20, 0]}
+      zoom={2}
+      style={{ height, width: '100%' }}
+    >
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      />
+      <FitBounds devices={validDevices} />
+      {validDevices.map((device) => (
+        <Marker
+          key={device.device_id}
+          position={[device.last_lat!, device.last_lon!]}
+          icon={createDeviceIcon(device.status)}
+          eventHandlers={{ click: () => onDeviceSelect && onDeviceSelect(device) }}
+        >
+          <Popup>
+            <div style={{ minWidth: 160 }}>
+              <strong>{device.device_name}</strong>
+              <div style={{ marginTop: 4, fontSize: 12 }}>
+                <div>Status: <span style={{ color: statusColor[device.status] }}>{device.status}</span></div>
+                {device.last_speed != null && <div>Speed: {device.last_speed} km/h</div>}
+                {device.last_seen && (
+                  <div>Last seen: {new Date(device.last_seen).toLocaleString()}</div>
+                )}
+                {device.group_name && <div>Group: {device.group_name}</div>}
+              </div>
+            </div>
+          </Popup>
+        </Marker>
+      ))}
+    </MapContainer>
+  );
 };
 
 export default DeviceMap;

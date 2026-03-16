@@ -1,1 +1,7 @@
 node_modules/
+
+# Environment files with secrets
+.env
+.env.local
+.env.*.local
+.env.production

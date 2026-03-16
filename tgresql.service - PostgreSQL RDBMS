@@ -1,0 +1,8 @@
+[0;1;32m●[0m postgresql.service - PostgreSQL RDBMS
+     Loaded: loaded (]8;;file://gnnscloud.dedicated.co.za/usr/lib/systemd/system/postgresql.service/usr/lib/systemd/system/postgresql.service]8;;; [0;1;32menabled[0m; preset: [0;1;32menabled[0m)
+     Active: [0;1;32mactive (exited)[0m since Thu 2026-03-12 15:57:13 SAST; 4 days ago
+   Main PID: 280639 (code=exited, status=0/SUCCESS)
+        CPU: 3ms
+
+Mar 12 15:57:13 gnnscloud.dedicated.co.za systemd[1]: Starting postgresql.service - PostgreSQL RDBMS...
+Mar 12 15:57:13 gnnscloud.dedicated.co.za systemd[1]: Finished postgresql.service - PostgreSQL RDBMS.

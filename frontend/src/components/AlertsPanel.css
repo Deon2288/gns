@@ -1,0 +1,132 @@
+.alerts-panel {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.alerts-panel h2 {
+    margin: 0 0 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 18px;
+}
+
+.alerts-count {
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.alerts-list {
+    margin-top: 15px;
+}
+
+.no-alerts {
+    text-align: center;
+    color: #999;
+    padding: 30px 0;
+    font-size: 14px;
+}
+
+.alert-item {
+    border-left: 4px solid #3b82f6;
+    padding: 12px;
+    margin-bottom: 12px;
+    background: #f9fafb;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.alert-item:hover {
+    background: #f3f4f6;
+}
+
+.alert-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.alert-icon {
+    font-size: 20px;
+}
+
+.alert-type {
+    font-weight: bold;
+    color: #333;
+    font-size: 13px;
+}
+
+.alert-severity {
+    padding: 3px 8px;
+    border-radius: 4px;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.alert-ack {
+    margin-left: auto;
+    background: #10b981;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.alert-message {
+    margin: 8px 0;
+    color: #555;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.alert-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+}
+
+.alert-time {
+    color: #999;
+}
+
+.alert-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
+
+.alert-btn:hover {
+    background: #5568d3;
+}
+
+.alerts-loading {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+}
+
+@media (max-width: 768px) {
+    .alerts-panel {
+        max-height: 400px;
+    }
+}

@@ -1,0 +1,13 @@
+.leaflet-container {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.leaflet-popup-content h4 {
+    margin-top: 0;
+    color: #667eea;
+}
+
+.leaflet-popup-content p {
+    margin: 5px 0;
+    font-size: 12px;
+}

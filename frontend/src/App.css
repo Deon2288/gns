@@ -1,0 +1,118 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f5f7fa;
+  color: #333;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.navbar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.nav-brand h1 {
+  font-size: 24px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.nav-tabs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.nav-tab {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  padding: 12px 20px;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.nav-tab:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-tab.active {
+  color: white;
+  border-bottom-color: white;
+}
+
+.alert-badge {
+  background: #ff4444;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.content-area {
+  flex: 1;
+  overflow: auto;
+  background: #f5f7fa;
+  padding: 20px;
+}
+
+.route-container {
+  display: flex;
+  gap: 20px;
+  height: 100%;
+}
+
+.map-sidebar {
+  flex: 1;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .nav-brand h1 {
+    font-size: 18px;
+  }
+
+  .nav-tabs {
+    width: 100%;
+    justify-content: space-around;
+  }
+
+  .nav-tab {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .content-area {
+    padding: 10px;
+  }
+}

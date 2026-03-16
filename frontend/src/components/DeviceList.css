@@ -1,0 +1,84 @@
+.device-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.device-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.device-card:hover {
+  transform: translateY(-5px);
+}
+
+.device-info h3 {
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+}
+
+.device-info p {
+  margin: 5px 0;
+  opacity: 0.9;
+}
+
+.status {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.status.active {
+  background: #4caf50;
+  color: white;
+}
+
+.status.inactive {
+  background: #ff9800;
+  color: white;
+}
+
+.device-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  flex: 1;
+}
+
+.btn-toggle {
+  background: #4caf50;
+  color: white;
+}
+
+.btn-toggle:hover {
+  background: #45a049;
+  transform: translateY(-2px);
+}
+
+.btn-delete {
+  background: #f44336;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #da190b;
+  transform: translateY(-2px);
+}

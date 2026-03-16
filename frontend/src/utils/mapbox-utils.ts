@@ -12,7 +12,7 @@ export const MAP_STYLES: Record<MapStyle, string> = {
     outdoors: 'mapbox://styles/mapbox/outdoors-v12',
 };
 
-/** Default map centre (London). */
+/** Default map center (London). */
 export const DEFAULT_CENTER: [number, number] = [-0.09, 51.505];
 export const DEFAULT_ZOOM = 13;
 

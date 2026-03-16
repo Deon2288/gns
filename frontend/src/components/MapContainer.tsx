@@ -47,8 +47,9 @@ interface MapContainerProps {
     animationRoute?: RoutePoint[];
     /** Initial map style. Default: 'streets'. */
     initialStyle?: MapStyle;
-    /** Map centre as [longitude, latitude]. */
+    /** Map center as [longitude, latitude]. Default: London [-0.09, 51.505]. */
     center?: [number, number];
+    /** Mapbox zoom level (0 = world, 22 = max detail). Default: 13. */
     zoom?: number;
     /** Enable 3-D terrain visualisation (requires satellite or outdoors style). */
     terrain?: boolean;

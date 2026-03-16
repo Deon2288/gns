@@ -1,52 +1,76 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
-const { Pool } = require('pg');
+const http = require('http');
+const WebSocket = require('ws');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 
-// Middleware
+// ── Middleware ──────────────────────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
 
-// PostgreSQL connection
-const pool = new Pool({
-    user: 'your_user',
-    host: 'localhost',
-    database: 'your_database',
-    password: 'your_password',
-    port: 5432,
+// ── Rate limiting ────────────────────────────────────────────────────────────
+
+/** Strict limiter for authentication endpoints (register / login). */
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 20,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: 'Too many requests, please try again later.' },
 });
 
-// JWT middleware
-const authenticateJWT = (req, res, next) => {
-    const token = req.headers['authorization'];
-    if (token) {
-        jwt.verify(token, 'your_jwt_secret', (err, user) => {
-            if (err) {
-                return res.sendStatus(403);
-            }
-            req.user = user;
-            next();
-        });
-    } else {
-        res.sendStatus(401);
-    }
-};
-
-// Basic routes
-app.post('/authenticate', (req, res) => {
-    // Your authentication logic here
+/** General API limiter for all other routes. */
+const apiLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 200,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: 'Too many requests, please try again later.' },
 });
 
-app.get('/devices', authenticateJWT, (req, res) => {
-    // Logic for getting devices
+// Apply strict limiter to auth endpoints
+app.use('/api/users/register', authLimiter);
+app.use('/api/users/login',    authLimiter);
+
+// Apply general limiter to all other /api routes
+app.use('/api', apiLimiter);
+
+// ── Routes ──────────────────────────────────────────────────────────────────
+app.use('/api/users',    require('./routes/users'));
+app.use('/api',          require('./routes/devices'));
+app.use('/api',          require('./routes/gps'));
+app.use('/api/alerts',   require('./routes/alerts'));
+app.use('/api/telemetry', require('./routes/telemetry'));
+
+// ── Health check ─────────────────────────────────────────────────────────────
+app.get('/health', (_req, res) => res.json({ status: 'ok', ts: new Date().toISOString() }));
+
+// ── HTTP + WebSocket server ───────────────────────────────────────────────────
+const PORT = process.env.PORT || 5000;
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server, path: '/ws' });
+
+/** Broadcast a JSON message to all connected WebSocket clients. */
+function broadcast(data) {
+    const payload = JSON.stringify(data);
+    wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(payload);
+        }
+    });
+}
+
+wss.on('connection', (ws) => {
+    ws.send(JSON.stringify({ type: 'connected', message: 'GNS WebSocket ready' }));
+    ws.on('error', (err) => console.error('WebSocket error:', err));
 });
 
-app.post('/devices', authenticateJWT, (req, res) => {
-    // Logic for adding a new device
-});
+// Expose broadcast so routes can push live updates
+app.locals.broadcast = broadcast;
 
-app.listen(3000, () => {
-    console.log('Server running on port 3000');
+server.listen(PORT, () => {
+    console.log(`GNS server listening on port ${PORT}`);
 });

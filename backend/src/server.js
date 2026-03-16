@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
+const rateLimit = require('express-rate-limit');
 
 const usersRouter = require('./routes/users');
 const devicesRouter = require('./routes/devices');
@@ -28,19 +29,25 @@ app.set('io', io);
 app.use(cors());
 app.use(express.json());
 
+// Rate limiting
+const apiLimiter = rateLimit({ windowMs: 60 * 1000, max: 200, standardHeaders: true, legacyHeaders: false });
+const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20, standardHeaders: true, legacyHeaders: false });
+
 // Health check
 app.get('/api/health', (_req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
 
 // API routes
-app.use('/api/users', usersRouter);
-app.use('/api/devices', devicesRouter);
-app.use('/api/gps', gpsRouter);
-app.use('/api/alerts', alertsRouter);
-app.use('/api/geofences', geofencesRouter);
-app.use('/api/trips', tripsRouter);
-app.use('/api/drivers', driversRouter);
-app.use('/api/analytics', analyticsRouter);
-app.use('/api/commands', commandsRouter);
+app.use('/api/users/login', authLimiter);
+app.use('/api/users/register', authLimiter);
+app.use('/api/users', apiLimiter, usersRouter);
+app.use('/api/devices', apiLimiter, devicesRouter);
+app.use('/api/gps', apiLimiter, gpsRouter);
+app.use('/api/alerts', apiLimiter, alertsRouter);
+app.use('/api/geofences', apiLimiter, geofencesRouter);
+app.use('/api/trips', apiLimiter, tripsRouter);
+app.use('/api/drivers', apiLimiter, driversRouter);
+app.use('/api/analytics', apiLimiter, analyticsRouter);
+app.use('/api/commands', apiLimiter, commandsRouter);
 
 // WebSocket connection handling
 io.on('connection', (socket) => {

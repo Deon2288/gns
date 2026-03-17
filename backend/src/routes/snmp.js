@@ -1,8 +1,17 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const router = express.Router();
 const { pollMetrics, getHistory, configureSNMP } = require('../controllers/snmpController');
 const { authenticate } = require('../middleware/auth');
 const { snmpConfigValidation } = require('../utils/validators');
+
+const snmpLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 60,
+  message: { error: 'Too many requests, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 /**
  * @swagger
@@ -12,7 +21,7 @@ const { snmpConfigValidation } = require('../utils/validators');
  *     tags: [SNMP]
  *     security: [{ bearerAuth: [] }]
  */
-router.post('/poll/:deviceId', authenticate, pollMetrics);
+router.post('/poll/:deviceId', snmpLimiter, authenticate, pollMetrics);
 
 /**
  * @swagger
@@ -22,7 +31,7 @@ router.post('/poll/:deviceId', authenticate, pollMetrics);
  *     tags: [SNMP]
  *     security: [{ bearerAuth: [] }]
  */
-router.get('/history/:deviceId', authenticate, getHistory);
+router.get('/history/:deviceId', snmpLimiter, authenticate, getHistory);
 
 /**
  * @swagger
@@ -32,6 +41,6 @@ router.get('/history/:deviceId', authenticate, getHistory);
  *     tags: [SNMP]
  *     security: [{ bearerAuth: [] }]
  */
-router.post('/configure', authenticate, snmpConfigValidation, configureSNMP);
+router.post('/configure', snmpLimiter, authenticate, snmpConfigValidation, configureSNMP);
 
 module.exports = router;

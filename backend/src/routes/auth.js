@@ -1,8 +1,17 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const router = express.Router();
 const { register, login, logout, refreshToken, getProfile } = require('../controllers/authController');
 const { authenticate } = require('../middleware/auth');
 const { registerValidation, loginValidation } = require('../utils/validators');
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20,
+  message: { error: 'Too many requests, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 /**
  * @swagger
@@ -26,7 +35,7 @@ const { registerValidation, loginValidation } = require('../utils/validators');
  *       400: { description: Validation error }
  *       409: { description: Email already in use }
  */
-router.post('/register', registerValidation, register);
+router.post('/register', authLimiter, registerValidation, register);
 
 /**
  * @swagger
@@ -35,7 +44,7 @@ router.post('/register', registerValidation, register);
  *     summary: Login user
  *     tags: [Auth]
  */
-router.post('/login', loginValidation, login);
+router.post('/login', authLimiter, loginValidation, login);
 
 /**
  * @swagger
@@ -45,7 +54,7 @@ router.post('/login', loginValidation, login);
  *     tags: [Auth]
  *     security: [{ bearerAuth: [] }]
  */
-router.post('/logout', authenticate, logout);
+router.post('/logout', authLimiter, authenticate, logout);
 
 /**
  * @swagger
@@ -54,7 +63,7 @@ router.post('/logout', authenticate, logout);
  *     summary: Refresh access token
  *     tags: [Auth]
  */
-router.post('/refresh', refreshToken);
+router.post('/refresh', authLimiter, refreshToken);
 
 /**
  * @swagger
@@ -64,6 +73,6 @@ router.post('/refresh', refreshToken);
  *     tags: [Auth]
  *     security: [{ bearerAuth: [] }]
  */
-router.get('/profile', authenticate, getProfile);
+router.get('/profile', authLimiter, authenticate, getProfile);
 
 module.exports = router;

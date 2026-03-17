@@ -1,8 +1,17 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const router = express.Router();
 const { scanNetwork, listDevices, getDevice, deleteDevice, getScanStatus } = require('../controllers/discoveryController');
 const { authenticate } = require('../middleware/auth');
 const { scanValidation } = require('../utils/validators');
+
+const discoveryLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 30,
+  message: { error: 'Too many requests, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 /**
  * @swagger
@@ -12,7 +21,7 @@ const { scanValidation } = require('../utils/validators');
  *     tags: [Discovery]
  *     security: [{ bearerAuth: [] }]
  */
-router.post('/scan', authenticate, scanValidation, scanNetwork);
+router.post('/scan', discoveryLimiter, authenticate, scanValidation, scanNetwork);
 
 /**
  * @swagger
@@ -22,7 +31,7 @@ router.post('/scan', authenticate, scanValidation, scanNetwork);
  *     tags: [Discovery]
  *     security: [{ bearerAuth: [] }]
  */
-router.get('/scan/:jobId', authenticate, getScanStatus);
+router.get('/scan/:jobId', discoveryLimiter, authenticate, getScanStatus);
 
 /**
  * @swagger
@@ -32,7 +41,7 @@ router.get('/scan/:jobId', authenticate, getScanStatus);
  *     tags: [Discovery]
  *     security: [{ bearerAuth: [] }]
  */
-router.get('/devices', authenticate, listDevices);
+router.get('/devices', discoveryLimiter, authenticate, listDevices);
 
 /**
  * @swagger
@@ -42,7 +51,7 @@ router.get('/devices', authenticate, listDevices);
  *     tags: [Discovery]
  *     security: [{ bearerAuth: [] }]
  */
-router.get('/devices/:id', authenticate, getDevice);
+router.get('/devices/:id', discoveryLimiter, authenticate, getDevice);
 
 /**
  * @swagger
@@ -52,6 +61,6 @@ router.get('/devices/:id', authenticate, getDevice);
  *     tags: [Discovery]
  *     security: [{ bearerAuth: [] }]
  */
-router.delete('/devices/:id', authenticate, deleteDevice);
+router.delete('/devices/:id', discoveryLimiter, authenticate, deleteDevice);
 
 module.exports = router;

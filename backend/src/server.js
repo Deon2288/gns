@@ -8,6 +8,8 @@ const app = express();
 // Import routes
 const discoveryRoutes = require('./routes/discovery');
 const snmpRoutes = require('./routes/snmp');
+const simRoutes = require('./routes/sim');
+const webhooksRoutes = require('./routes/webhooks');
 
 // Middleware
 app.use(cors());
@@ -57,9 +59,17 @@ app.post('/devices', (req, res) => {
     res.json({ message: 'Device added' });
 });
 
+// Attach pool to every request so routes can access it via req.pool
+app.use((req, res, next) => {
+    req.pool = pool;
+    next();
+});
+
 // API Routes
 app.use('/api/discovery', discoveryRoutes);
 app.use('/api/snmp', snmpRoutes);
+app.use('/api/sim', simRoutes);
+app.use('/api/webhooks', webhooksRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

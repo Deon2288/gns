@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "avl": "node src/avl-server.js",
-    "start:all": "concurrently \"npm run dev\" \"npm run avl\""
+    "start:all": "concurrently \"npm run dev\" \"npm run avl\"",
+    "start": "node src/server.js",
+    "test": "jest --forceExit --detectOpenHandles",
+    "test:coverage": "jest --coverage --forceExit --detectOpenHandles"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -14,12 +17,28 @@
     "cors": "^2.8.6",
     "dotenv": "^16.6.1",
     "express": "^4.22.1",
+    "express-validator": "^7.3.1",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.20.0",
     "ping": "^0.4.4",
+    "sequelize": "^6.37.8",
+    "sequelize-cli": "^6.6.5",
+    "sqlite3": "^6.0.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "winston": "^3.19.0",
     "ws": "^8.19.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "jest": "^30.3.0",
+    "nodemon": "^3.1.14",
+    "supertest": "^7.2.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ],
+    "coverageDirectory": "coverage"
   }
 }

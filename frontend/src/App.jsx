@@ -24,7 +24,7 @@ const AuthPage = () => {
 
 const ProtectedLayout = () => {
   const { isAuthenticated, loading } = useAuth();
-  const [selectedDevice, setSelectedDevice] = useState<any>(null);
+  const [selectedDevice, setSelectedDevice] = useState(null);
 
   if (loading) return <Loading fullPage message="Authenticating..." />;
   if (!isAuthenticated) return <Navigate to="/login" replace />;

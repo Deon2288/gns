@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import axios from 'axios';
 import './Dashboard.css';
 
@@ -44,7 +44,6 @@ export const Dashboard: React.FC = () => {
                     { range: '100+ km/h', min: 100, max: 999, count: 0 },
                 ];
 
-                let totalDistance = 0;
                 let totalSpeed = 0;
                 let speedCount = 0;
 

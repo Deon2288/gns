@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
@@ -8,6 +9,9 @@ const app = express();
 // Import routes
 const discoveryRoutes = require('./routes/discovery');
 const snmpRoutes = require('./routes/snmp');
+const simRoutes = require('./routes/sim');
+const settingsRoutes = require('./routes/settings');
+const webhookRoutes = require('./routes/webhooks');
 
 // Middleware
 app.use(cors());
@@ -60,6 +64,9 @@ app.post('/devices', (req, res) => {
 // API Routes
 app.use('/api/discovery', discoveryRoutes);
 app.use('/api/snmp', snmpRoutes);
+app.use('/api/sim', simRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/webhooks', webhookRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

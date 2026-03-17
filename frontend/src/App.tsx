@@ -3,15 +3,13 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import axios from 'axios';
 import { MapView } from './components/MapContainer';
 import { Dashboard } from './components/Dashboard';
-import { InteractiveMap } from './components/InteractiveMap';
-import { DeviceDetails } from './components/DeviceDetails';
 import { AlertsComponent } from './components/AlertsComponent';
 import { AdminPanel } from './components/AdminPanel';
+import { SimDashboard } from './components/SimControl';
 import './App.css';
 
 function App() {
   const [activeTab, setActiveTab] = useState('map');
-  const [selectedDeviceId, setSelectedDeviceId] = useState<number | null>(null);
   const [unacknowledgedAlerts, setUnacknowledgedAlerts] = useState(0);
 
   useEffect(() => {
@@ -73,6 +71,13 @@ function App() {
             >
               ⚙️ Admin
             </Link>
+            <Link
+              to="/sim"
+              className={`nav-tab ${activeTab === 'sim' ? 'active' : ''}`}
+              onClick={() => setActiveTab('sim')}
+            >
+              📱 SIM Management
+            </Link>
           </div>
         </nav>
 
@@ -83,6 +88,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/alerts" element={<AlertsComponent />} />
             <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/sim" element={<SimDashboard />} />
           </Routes>
         </div>
       </div>

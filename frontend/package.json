@@ -1,0 +1,1 @@
+{\n  "dependencies": {\n    "react-router-dom": "latest",\n    "mapbox-gl": "latest",\n    "recharts": "latest",\n    "leaflet": "latest"\n  },\n  "devDependencies": {\n    "@types/leaflet": "latest"\n  }\n}

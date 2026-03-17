@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { exec } = require('child_process');
+const { spawn } = require('child_process');
 const { v4: uuidv4 } = require('uuid');
 const pool = require('../db');
 
@@ -23,6 +23,12 @@ function cidrHostCount(ipRange) {
   return Math.max(1, Math.pow(2, 32 - prefix) - 2);
 }
 
+function sanitizeHostname(name) {
+  if (!name) return null;
+  // Allow only safe hostname characters
+  return name.replace(/[^a-zA-Z0-9._-]/g, '').slice(0, 64) || null;
+}
+
 function parseNmapOutput(output) {
   const devices = [];
   const lines = output.split('\n');
@@ -33,7 +39,7 @@ function parseNmapOutput(output) {
     if (reportMatch) {
       if (currentDevice) devices.push(currentDevice);
       currentDevice = {
-        hostname: reportMatch[1] || null,
+        hostname: sanitizeHostname(reportMatch[1]),
         ip_address: reportMatch[2],
         ports: [],
         status: 'online',
@@ -95,17 +101,21 @@ router.post('/scan', async (req, res) => {
   // Respond immediately with scan ID
   res.json({ scan_id: scanId, status: 'running', message: 'Scan started' });
 
-  // Run nmap in background
-  const portList = ports.join(',');
-  const cmd = `nmap -sn -p ${portList} --open -T4 ${ipRange} 2>/dev/null`;
+  // Run nmap in background using spawn (avoids shell injection)
+  const portList = ports.filter(p => Number.isInteger(p) && p > 0 && p < 65536).join(',');
+  const nmapArgs = ['-sn', '-p', portList, '--open', '-T4', ipRange];
+  const nmapProc = spawn('nmap', nmapArgs, { timeout: 120000 });
 
-  exec(cmd, { timeout: 120000 }, async (error, stdout, stderr) => {
-    if (error && error.killed) {
+  let stdout = '';
+  nmapProc.stdout.on('data', (chunk) => { stdout += chunk; });
+
+  nmapProc.on('close', async (code, signal) => {
+    if (signal === 'SIGKILL' || signal === 'SIGTERM') {
       scan.status = 'timeout';
       scan.error = 'Scan timed out';
     } else {
       try {
-        const devices = parseNmapOutput(stdout || '');
+        const devices = parseNmapOutput(stdout);
         scan.results = devices;
         scan.total_hosts = cidrHostCount(ipRange);
         scan.discovered_count = devices.length;
@@ -126,6 +136,12 @@ router.post('/scan', async (req, res) => {
         scan.error = parseErr.message;
       }
     }
+    scanStore.set(scanId, scan);
+  });
+
+  nmapProc.on('error', (err) => {
+    scan.status = 'error';
+    scan.error = err.message;
     scanStore.set(scanId, scan);
   });
 });

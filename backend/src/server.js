@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const http = require('http');
 const WebSocket = require('ws');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const server = http.createServer(app);
@@ -34,7 +35,25 @@ app.locals.broadcast = broadcast;
 app.use(cors());
 app.use(express.json());
 
-// Health check
+// General API rate limiter: 300 requests per 15 minutes
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests, please try again later.' },
+});
+
+// Stricter rate limit for discovery scans (resource-intensive nmap)
+const scanLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many scan requests. Please wait before scanning again.' },
+});
+
+// Health check (no rate limit needed)
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
@@ -46,12 +65,13 @@ const snmpRoutes = require('./routes/snmp');
 const gpsRoutes = require('./routes/gps');
 const userRoutes = require('./routes/users');
 
-// Mount routes
-app.use('/api/devices', deviceRoutes);
-app.use('/api/discovery', discoveryRoutes);
-app.use('/api/snmp', snmpRoutes);
-app.use('/api/gps', gpsRoutes);
-app.use('/api/users', userRoutes);
+// Mount routes with rate limiting
+app.use('/api/devices', apiLimiter, deviceRoutes);
+app.use('/api/discovery/scan', scanLimiter);
+app.use('/api/discovery', apiLimiter, discoveryRoutes);
+app.use('/api/snmp', apiLimiter, snmpRoutes);
+app.use('/api/gps', apiLimiter, gpsRoutes);
+app.use('/api/users', apiLimiter, userRoutes);
 
 // 404 handler
 app.use((req, res) => {

@@ -230,8 +230,14 @@ async function apiFetch(path: string, opts?: RequestInit) {
     headers: { 'Content-Type': 'application/json' },
     ...opts,
   });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || res.statusText);
+  let data: { error?: string } | null = null;
+  try {
+    data = await res.json();
+  } catch {
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return null;
+  }
+  if (!res.ok) throw new Error((data as { error?: string })?.error || `HTTP ${res.status}: ${res.statusText}`);
   return data;
 }
 
@@ -774,12 +780,14 @@ function SimpleLineChart({ data, color, unit }: { data: Array<{ time: string; va
     <svg viewBox={`0 0 ${width} ${height}`} style={{ width: '100%', height: 120 }}>
       <polygon points={areaPoints} fill={color} fillOpacity="0.1" />
       <polyline points={points} fill="none" stroke={color} strokeWidth="2" />
-      {data.filter((_, i) => i % Math.ceil(data.length / 5) === 0).map((d, i, arr) => {
-        const origIdx = data.findIndex(x => x === d);
-        return (
-          <text key={i} x={pad.left + origIdx * xStep} y={height - 8} fontSize="9" fill="#666" textAnchor="middle">{d.time}</text>
-        );
-      })}
+      {data.reduce<React.ReactNode[]>((acc, d, i) => {
+        if (i % Math.ceil(data.length / 5) === 0) {
+          acc.push(
+            <text key={i} x={pad.left + i * xStep} y={height - 8} fontSize="9" fill="#666" textAnchor="middle">{d.time}</text>
+          );
+        }
+        return acc;
+      }, [])}
       <text x={pad.left - 5} y={yScale(maxV) + 4} fontSize="9" fill="#666" textAnchor="end">{maxV.toFixed(0)}{unit}</text>
       <text x={pad.left - 5} y={yScale(minV) + 4} fontSize="9" fill="#666" textAnchor="end">{minV.toFixed(0)}{unit}</text>
     </svg>

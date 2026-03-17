@@ -980,7 +980,7 @@ function AnalyticsTab() {
           <p style={{ color: '#888', textAlign: 'center', padding: 20 }}>No data yet</p>
         ) : (
           <p style={{ color: '#888', fontSize: 13, padding: 10 }}>
-            Devices registered over time will appear here once GPS trip data is collected.
+            Device registration history and trend data will appear here once more devices are monitored over time.
           </p>
         )}
       </div>

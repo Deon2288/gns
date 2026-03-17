@@ -3,8 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import axios from 'axios';
 import { MapView } from './components/MapContainer';
 import { Dashboard } from './components/Dashboard';
-import { InteractiveMap } from './components/InteractiveMap';
-import { DeviceDetails } from './components/DeviceDetails';
 import { AlertsComponent } from './components/AlertsComponent';
 import { AdminPanel } from './components/AdminPanel';
 import { SimDashboard } from './components/SimControl';
@@ -12,7 +10,6 @@ import './App.css';
 
 function App() {
   const [activeTab, setActiveTab] = useState('map');
-  const [selectedDeviceId, setSelectedDeviceId] = useState<number | null>(null);
   const [unacknowledgedAlerts, setUnacknowledgedAlerts] = useState(0);
 
   useEffect(() => {

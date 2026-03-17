@@ -1,38 +1,66 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const router = express.Router();
-const { exec } = require('child_process');
-const ping = require('ping');
-const { Pool } = require('pg');
+const { scanNetwork, listDevices, getDevice, deleteDevice, getScanStatus } = require('../controllers/discoveryController');
+const { authenticate } = require('../middleware/auth');
+const { scanValidation } = require('../utils/validators');
 
-const pool = new Pool({
-    user: process.env.DB_USER || 'postgres',
-    host: process.env.DB_HOST || 'localhost',
-    database: process.env.DB_NAME || 'gns_db',
-    password: process.env.DB_PASSWORD || 'password',
-    port: process.env.DB_PORT || 5432,
+const discoveryLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 30,
+  message: { error: 'Too many requests, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
-router.post('/scan', async (req, res) => {
-    try {
-        const { ipRange = '172.28.0.0/24' } = req.body;
-        res.json({ message: 'Scan started', ipRange });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+/**
+ * @swagger
+ * /api/discovery/scan:
+ *   post:
+ *     summary: Start a network scan
+ *     tags: [Discovery]
+ *     security: [{ bearerAuth: [] }]
+ */
+router.post('/scan', discoveryLimiter, authenticate, scanValidation, scanNetwork);
 
-router.get('/status/:ip', async (req, res) => {
-    try {
-        const { ip } = req.params;
-        const result = await ping.promise.probe(ip);
-        res.json({
-            ip,
-            status: result.alive ? 'online' : 'offline',
-            time: result.time
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+/**
+ * @swagger
+ * /api/discovery/scan/{jobId}:
+ *   get:
+ *     summary: Get scan job status
+ *     tags: [Discovery]
+ *     security: [{ bearerAuth: [] }]
+ */
+router.get('/scan/:jobId', discoveryLimiter, authenticate, getScanStatus);
+
+/**
+ * @swagger
+ * /api/discovery/devices:
+ *   get:
+ *     summary: List discovered devices
+ *     tags: [Discovery]
+ *     security: [{ bearerAuth: [] }]
+ */
+router.get('/devices', discoveryLimiter, authenticate, listDevices);
+
+/**
+ * @swagger
+ * /api/discovery/devices/{id}:
+ *   get:
+ *     summary: Get device details
+ *     tags: [Discovery]
+ *     security: [{ bearerAuth: [] }]
+ */
+router.get('/devices/:id', discoveryLimiter, authenticate, getDevice);
+
+/**
+ * @swagger
+ * /api/discovery/devices/{id}:
+ *   delete:
+ *     summary: Delete a device
+ *     tags: [Discovery]
+ *     security: [{ bearerAuth: [] }]
+ */
+router.delete('/devices/:id', discoveryLimiter, authenticate, deleteDevice);
 
 module.exports = router;

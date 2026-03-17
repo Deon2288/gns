@@ -1,76 +1,71 @@
 const express = require('express');
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
-const { Pool } = require('pg');
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 
-const app = express();
+const { PORT, NODE_ENV } = require('./config/constants');
+const { connectDB } = require('./config/database');
+const logger = require('./utils/logger');
+const errorHandler = require('./middleware/errorHandler');
 
-// Import routes
+// Routes
+const authRoutes = require('./routes/auth');
 const discoveryRoutes = require('./routes/discovery');
 const snmpRoutes = require('./routes/snmp');
+const healthRoutes = require('./routes/health');
+
+const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// PostgreSQL connection
-const pool = new Pool({
-    user: process.env.DB_USER || 'your_user',
-    host: process.env.DB_HOST || 'localhost',
-    database: process.env.DB_NAME || 'your_database',
-    password: process.env.DB_PASSWORD || 'your_password',
-    port: process.env.DB_PORT || 5432,
-});
-
-// Health check endpoint
-app.get('/health', (req, res) => {
-    res.json({ status: 'ok', message: 'Server is running' });
-});
-
-// JWT middleware
-const authenticateJWT = (req, res, next) => {
-    const token = req.headers['authorization'];
-    if (token) {
-        jwt.verify(token, 'your_jwt_secret', (err, user) => {
-            if (err) {
-                return res.sendStatus(403);
-            }
-            req.user = user;
-            next();
-        });
-    } else {
-        res.sendStatus(401);
-    }
+// Swagger setup
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: { title: 'GNS API', version: '1.0.0', description: 'Global Network Surveillance API' },
+    components: {
+      securitySchemes: {
+        bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      },
+    },
+  },
+  apis: ['./src/routes/*.js'],
 };
-
-// Authentication routes
-app.post('/authenticate', (req, res) => {
-    res.json({ token: 'sample_token' });
-});
-
-// Device routes
-app.get('/devices', (req, res) => {
-    res.json({ devices: [] });
-});
-
-app.post('/devices', (req, res) => {
-    res.json({ message: 'Device added' });
-});
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // API Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/discovery', discoveryRoutes);
 app.use('/api/snmp', snmpRoutes);
+app.use('/api/health', healthRoutes);
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ error: 'Internal server error' });
+// Legacy health check
+app.get('/health', (req, res) => res.json({ status: 'ok', message: 'Server is running' }));
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found', code: 'NOT_FOUND' });
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log('✅ Database connected successfully');
-});
+// Centralized error handler
+app.use(errorHandler);
+
+if (NODE_ENV !== 'test') {
+  connectDB()
+    .then(() => {
+      app.listen(PORT, () => {
+        logger.info(`🚀 Server running on port ${PORT}`);
+        logger.info(`📚 API docs available at http://localhost:${PORT}/api/docs`);
+      });
+    })
+    .catch((err) => {
+      logger.error('Failed to start server:', err);
+      process.exit(1);
+    });
+}
 
 module.exports = app;

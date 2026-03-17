@@ -41,8 +41,8 @@ export const InteractiveMap: React.FC<{ selectedDeviceId?: number }> = ({ select
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const devicesRes = await axios.get('/api/devices');
-                const gpsRes = await axios.get('/api/gps/latest?limit=500');
+                const devicesRes = await axios.get('http://197.242.150.120:5000/api/devices');
+                const gpsRes = await axios.get('http://197.242.150.120:5000/api/gps/latest?limit=500');
 
                 const devicesData: Device[] = devicesRes.data.map((d: any) => ({
                     device_id: d.device_id,

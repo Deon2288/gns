@@ -17,7 +17,7 @@ function App() {
   useEffect(() => {
     const fetchAlertsCount = async () => {
       try {
-        const res = await axios.get('/api/alerts?limit=100');
+        const res = await axios.get('http://197.242.150.120:5000/api/alerts?limit=100');
         const unacknowledged = res.data.filter((a: any) => !a.acknowledged).length;
         setUnacknowledgedAlerts(unacknowledged);
       } catch (err) {

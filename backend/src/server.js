@@ -8,6 +8,11 @@ const app = express();
 // Import routes
 const discoveryRoutes = require('./routes/discovery');
 const snmpRoutes = require('./routes/snmp');
+const firmwareRoutes = require('./routes/firmware');
+const remoteRoutes = require('./routes/remote');
+const vpnRoutes = require('./routes/vpn');
+const tasksRoutes = require('./routes/tasks');
+const reportsRoutes = require('./routes/reports');
 
 // Middleware
 app.use(cors());
@@ -20,6 +25,12 @@ const pool = new Pool({
     database: process.env.DB_NAME || 'your_database',
     password: process.env.DB_PASSWORD || 'your_password',
     port: process.env.DB_PORT || 5432,
+});
+
+// Attach pool to every request so route handlers can use req.pool
+app.use((req, res, next) => {
+    req.pool = pool;
+    next();
 });
 
 // Health check endpoint
@@ -60,6 +71,11 @@ app.post('/devices', (req, res) => {
 // API Routes
 app.use('/api/discovery', discoveryRoutes);
 app.use('/api/snmp', snmpRoutes);
+app.use('/api/firmware', firmwareRoutes);
+app.use('/api/remote', remoteRoutes);
+app.use('/api/vpn', vpnRoutes);
+app.use('/api/tasks', tasksRoutes);
+app.use('/api/reports', reportsRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

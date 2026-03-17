@@ -63,6 +63,19 @@ app.post('/api/devices', (req, res) => {
     res.status(201).json(newDevice);
 });
 
+// Enterprise feature routes
+const firmwareRoutes = require('./src/routes/firmware');
+const remoteRoutes = require('./src/routes/remote');
+const vpnRoutes = require('./src/routes/vpn');
+const tasksRoutes = require('./src/routes/tasks');
+const reportsRoutes = require('./src/routes/reports');
+
+app.use('/api/firmware', firmwareRoutes);
+app.use('/api/remote', remoteRoutes);
+app.use('/api/vpn', vpnRoutes);
+app.use('/api/tasks', tasksRoutes);
+app.use('/api/reports', reportsRoutes);
+
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📡 Listening on all interfaces (0.0.0.0:${PORT})`);

@@ -7,6 +7,11 @@ import { InteractiveMap } from './components/InteractiveMap';
 import { DeviceDetails } from './components/DeviceDetails';
 import { AlertsComponent } from './components/AlertsComponent';
 import { AdminPanel } from './components/AdminPanel';
+import { FirmwareManagement } from './components/FirmwareManagement';
+import { RemoteAccess } from './components/RemoteAccess';
+import { VPNManagement } from './components/VPNManagement';
+import { TaskScheduler } from './components/TaskScheduler';
+import { ReportsAnalytics } from './components/ReportsAnalytics';
 import './App.css';
 
 function App() {

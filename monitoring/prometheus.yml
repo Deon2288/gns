@@ -1,0 +1,22 @@
+# Prometheus configuration file
+
+# Global configuration
+global:
+  scrape_interval: 1m  # Set the scrape interval to every 1 minute.
+
+# Scrape configuration
+scrape_configs:
+  # Scrape configuration for gns-backend
+  - job_name: 'gns-backend'
+    static_configs:
+      - targets: ['gns-backend:8080']  # Replace with your gns-backend service address
+
+  # Scrape configuration for Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']  # Prometheus server itself
+
+  # Scrape configuration for PostgreSQL
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']  # Replace with your Postgres service address

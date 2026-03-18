@@ -2,27 +2,29 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
 
+if (!process.env.JWT_SECRET) {
+    console.warn('WARNING: JWT_SECRET env var is not set. Using insecure default – set JWT_SECRET in production.');
+}
+const JWT_SECRET = process.env.JWT_SECRET || 'changeme_jwt_secret';
+
 // User registration endpoint
-router.post('/register', (req, res) => {
-    const { username, password } = req.body;
-    // TODO: Implement user registration logic
-    // Send response after registration
+router.post('/register', (_req, res) => {
+    // TODO: Implement user registration (hash password, save to DB)
+    res.status(501).json({ error: 'User registration is not yet implemented' });
 });
 
 // User login endpoint
-router.post('/login', (req, res) => {
-    const { username, password } = req.body;
-    // TODO: Implement user login logic
-    // Generate JWT token after successful login
-    const token = jwt.sign({ userId: '<USER_ID>' }, 'your_jwt_secret', { expiresIn: '1h' });
-    res.json({ token });
+router.post('/login', (_req, res) => {
+    // TODO: Implement credential verification against DB
+    res.status(501).json({ error: 'User login is not yet implemented' });
 });
 
 // Middleware for token authentication
 const authenticateToken = (req, res, next) => {
-    const token = req.headers['authorization'] && req.headers['authorization'].split(' ')[1];
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
     if (!token) return res.sendStatus(401);
-    jwt.verify(token, 'your_jwt_secret', (err, user) => {
+    jwt.verify(token, JWT_SECRET, (err, user) => {
         if (err) return res.sendStatus(403);
         req.user = user;
         next();

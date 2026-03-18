@@ -1,22 +1,19 @@
 const express = require('express');
 const router = express.Router();
 
-// Polling endpoint
+// GET /polling - poll SNMP data
 router.get('/polling', (req, res) => {
-    // Logic for polling SNMP data
-    res.send('SNMP data polled successfully');
+    res.json({ message: 'SNMP data polled successfully' });
 });
 
-// Metrics endpoint
+// GET /metrics - retrieve SNMP metrics
 router.get('/metrics', (req, res) => {
-    // Logic for retrieving SNMP metrics
-    res.send('SNMP metrics retrieved successfully');
+    res.json({ message: 'SNMP metrics retrieved successfully', metrics: [] });
 });
 
-// Device monitoring endpoint
-router.get('/devices', (req, res) => {
-    // Logic for monitoring SNMP devices
-    res.send('Monitoring SNMP devices successfully');
+// GET /monitor - monitor SNMP devices
+router.get('/monitor', (req, res) => {
+    res.json({ message: 'Monitoring SNMP devices successfully', devices: [] });
 });
 
 module.exports = router;

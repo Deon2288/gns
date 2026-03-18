@@ -4,6 +4,7 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const { Pool } = require('pg');
 
 const app = express();
@@ -12,6 +13,24 @@ const PORT = process.env.PORT || 5000;
 // ── Middleware ────────────────────────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
+
+// Rate limiter for auth/sensitive endpoints (100 req per 15 min per IP)
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many requests, please try again later' },
+});
+
+// Rate limiter for resource-intensive endpoints (20 req per 15 min per IP)
+const heavyLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 20,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many requests, please try again later' },
+});
 
 // Attach PostgreSQL pool to every request (skipped when DB is not configured)
 let pool = null;
@@ -34,9 +53,9 @@ app.use((req, _res, next) => {
 // ── Routes ────────────────────────────────────────────────────────────────────
 app.use('/api/devices', require('./src/routes/devices'));
 app.use('/api/gps', require('./src/routes/gps'));
-app.use('/api/discovery', require('./src/routes/discovery'));
+app.use('/api/discovery', heavyLimiter, require('./src/routes/discovery'));
 app.use('/api/snmp', require('./src/routes/snmp'));
-app.use('/api/users', require('./src/routes/users'));
+app.use('/api/users', authLimiter, require('./src/routes/users'));
 
 // Health check
 app.get('/', (_req, res) => {

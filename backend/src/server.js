@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const rateLimit = require('express-rate-limit');
 const { Pool } = require('pg');
 
 const app = express();
@@ -14,6 +15,15 @@ const JWT_SECRET = process.env.JWT_SECRET || (() => {
 // ── Middleware ────────────────────────────────────────────────────────────────
 app.use(cors());
 app.use(express.json());
+
+// Rate limiter for auth endpoints (100 req per 15 min per IP)
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many requests, please try again later' },
+});
 
 // ── PostgreSQL connection pool ────────────────────────────────────────────────
 const pool = new Pool({
@@ -44,7 +54,7 @@ const authenticateJWT = (req, res, next) => {
 };
 
 // ── Routes ────────────────────────────────────────────────────────────────────
-app.post('/authenticate', (req, res) => {
+app.post('/authenticate', authLimiter, (req, res) => {
     const { username, password } = req.body;
     if (!username || !password) {
         return res.status(400).json({ error: 'Username and password are required' });
@@ -54,11 +64,11 @@ app.post('/authenticate', (req, res) => {
     res.json({ token });
 });
 
-app.get('/devices', authenticateJWT, (req, res) => {
+app.get('/devices', authLimiter, authenticateJWT, (req, res) => {
     res.json({ message: 'Device list endpoint - use /api/devices via index.js' });
 });
 
-app.post('/devices', authenticateJWT, (req, res) => {
+app.post('/devices', authLimiter, authenticateJWT, (req, res) => {
     res.json({ message: 'Create device endpoint - use /api/devices via index.js' });
 });
 

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 // Mock database for devices
-dlet devices = [];
+let devices = [];
 
 // Get all devices
 router.get('/devices', (req, res) => {

@@ -1,0 +1,498 @@
+/* DevicesPage.css - Responsive device management styles */
+
+.devices-page {
+    padding: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: #1a202c;
+}
+
+/* ── Header ── */
+.devices-header {
+    margin-bottom: 1.5rem;
+}
+
+.devices-header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem;
+}
+
+.devices-subtitle {
+    color: #718096;
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+/* ── Error banner ── */
+.devices-error {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #fff5f5;
+    border: 1px solid #fc8181;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    color: #c53030;
+}
+
+.devices-error button {
+    margin-left: auto;
+    background: #c53030;
+    color: #fff;
+    border: none;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+/* ── Loading ── */
+.devices-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem;
+    color: #718096;
+}
+
+.spinner {
+    width: 36px;
+    height: 36px;
+    border: 4px solid #e2e8f0;
+    border-top-color: #4299e1;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ── Controls bar ── */
+.devices-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.search-input {
+    flex: 1 1 220px;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.search-input:focus {
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+}
+
+.status-filter {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    background: #fff;
+    cursor: pointer;
+    outline: none;
+}
+
+.status-filter:focus {
+    border-color: #4299e1;
+}
+
+.view-toggle {
+    display: flex;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.view-toggle button {
+    background: #fff;
+    border: none;
+    padding: 0.5rem 0.875rem;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.15s;
+}
+
+.view-toggle button:hover {
+    background: #edf2f7;
+}
+
+.view-toggle button.active {
+    background: #4299e1;
+    color: #fff;
+}
+
+.refresh-btn {
+    padding: 0.5rem 1rem;
+    background: #4299e1;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: background 0.15s;
+}
+
+.refresh-btn:hover {
+    background: #3182ce;
+}
+
+.results-count {
+    font-size: 0.8rem;
+    color: #718096;
+    margin: 0 0 0.75rem;
+}
+
+/* ── Empty state ── */
+.devices-empty {
+    text-align: center;
+    padding: 3rem;
+    color: #718096;
+    font-size: 1rem;
+}
+
+/* ── Table view ── */
+.table-wrapper {
+    overflow-x: auto;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.devices-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    font-size: 0.875rem;
+}
+
+.devices-table thead {
+    background: #f7fafc;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.devices-table th {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #4a5568;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.devices-table th:hover {
+    background: #edf2f7;
+}
+
+.sort-icon {
+    margin-left: 4px;
+    opacity: 0.4;
+    font-size: 0.8em;
+}
+
+.sort-icon.active {
+    opacity: 1;
+    color: #4299e1;
+}
+
+.devices-table tbody tr {
+    border-bottom: 1px solid #e2e8f0;
+    transition: background 0.1s;
+}
+
+.devices-table tbody tr:hover {
+    background: #ebf8ff;
+}
+
+.devices-table td {
+    padding: 0.75rem 1rem;
+    color: #2d3748;
+    vertical-align: middle;
+}
+
+.device-name-link {
+    background: none;
+    border: none;
+    color: #3182ce;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: inherit;
+    padding: 0;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    transition: text-decoration-color 0.15s;
+}
+
+.device-name-link:hover {
+    text-decoration-color: #3182ce;
+}
+
+.mono {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.8em;
+}
+
+/* ── Status badges ── */
+.status-badge {
+    display: inline-block;
+    padding: 0.2em 0.6em;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.status-online {
+    background: #c6f6d5;
+    color: #22543d;
+}
+
+.status-offline {
+    background: #fed7d7;
+    color: #742a2a;
+}
+
+.status-unknown {
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
+/* ── Action buttons in table ── */
+.actions-cell {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.btn-details {
+    padding: 0.3rem 0.7rem;
+    border: 1px solid #4299e1;
+    border-radius: 4px;
+    background: #fff;
+    color: #4299e1;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.btn-details:hover {
+    background: #4299e1;
+    color: #fff;
+}
+
+.btn-delete {
+    padding: 0.3rem 0.7rem;
+    border: 1px solid #fc8181;
+    border-radius: 4px;
+    background: #fff;
+    color: #c53030;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.btn-delete:hover {
+    background: #c53030;
+    color: #fff;
+}
+
+/* ── Maps link ── */
+.maps-link {
+    color: #38a169;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.maps-link:hover {
+    text-decoration: underline;
+}
+
+/* ── Card grid view ── */
+.devices-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.device-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.device-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.card-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #2d3748;
+}
+
+.card-body {
+    padding: 0.875rem 1rem;
+    flex: 1;
+    font-size: 0.85rem;
+    color: #4a5568;
+    line-height: 1.7;
+}
+
+.card-body p {
+    margin: 0;
+}
+
+.card-footer {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid #e2e8f0;
+    flex-wrap: wrap;
+}
+
+/* ── Modals ── */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.modal-content {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-confirm {
+    max-width: 380px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-header h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+    color: #2d3748;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #718096;
+    line-height: 1;
+    padding: 0;
+}
+
+.modal-close:hover {
+    color: #2d3748;
+}
+
+.modal-body {
+    padding: 1.25rem 1.5rem;
+    flex: 1;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f7fafc;
+    gap: 1rem;
+    font-size: 0.875rem;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #718096;
+    min-width: 100px;
+}
+
+.detail-value {
+    color: #2d3748;
+    text-align: right;
+    word-break: break-all;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .devices-page {
+        padding: 1rem;
+    }
+
+    .devices-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .view-toggle {
+        width: fit-content;
+    }
+
+    .devices-table th,
+    .devices-table td {
+        padding: 0.6rem 0.75rem;
+    }
+
+    .actions-cell {
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+}

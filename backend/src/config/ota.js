@@ -1,0 +1,8 @@
+module.exports = {
+  MAX_FIRMWARE_SIZE: 500 * 1024 * 1024, // 500MB
+  FIRMWARE_STORAGE_PATH: process.env.FIRMWARE_STORAGE_PATH || './uploads/firmware',
+  UPDATE_TIMEOUT_MS: 30 * 60 * 1000, // 30 minutes
+  POLLING_INTERVAL_MS: 5000, // 5 seconds
+  MAX_RETRY_ATTEMPTS: 3,
+  RETRY_BACKOFF_MS: 5000,
+};

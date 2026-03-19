@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: gns-postgres-prod
+    environment:
+      POSTGRES_USER: gns_user
+      POSTGRES_PASSWORD: secure_password
+      POSTGRES_DB: gns_database
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - gns-network-prod
+    restart: always
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: gns-backend-prod
+    depends_on:
+      - postgres
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: gns_user
+      DB_PASSWORD: secure_password
+      DB_NAME: gns_database
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    networks:
+      - gns-network-prod
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: gns-frontend-prod
+    depends_on:
+      - backend
+    environment:
+      REACT_APP_API_URL: https://api.gnns.co.za
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    networks:
+      - gns-network-prod
+    restart: always
+
+volumes:
+  postgres_data_prod:
+
+networks:
+  gns-network-prod:
+    driver: bridge

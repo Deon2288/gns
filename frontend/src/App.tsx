@@ -2,26 +2,34 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import axios from 'axios';
 import { MapView } from './components/MapContainer';
+import { DevicesPage } from './components/DevicesPage';
 import { Dashboard } from './components/Dashboard';
-import { InteractiveMap } from './components/InteractiveMap';
-import { DeviceDetails } from './components/DeviceDetails';
 import { AlertsComponent } from './components/AlertsComponent';
 import { AdminPanel } from './components/AdminPanel';
 import './App.css';
 
 function App() {
   const [activeTab, setActiveTab] = useState('map');
-  const [selectedDeviceId, setSelectedDeviceId] = useState<number | null>(null);
   const [unacknowledgedAlerts, setUnacknowledgedAlerts] = useState(0);
 
   useEffect(() => {
     const fetchAlertsCount = async () => {
       try {
-        const res = await axios.get('http://197.242.150.120:5000/api/alerts?limit=100');
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+        const res = await axios.get('http://197.242.150.120:5000/api/alerts?limit=100', {
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        
         const unacknowledged = res.data.filter((a: any) => !a.acknowledged).length;
         setUnacknowledgedAlerts(unacknowledged);
-      } catch (err) {
-        console.error('Error fetching alerts count:', err);
+      } catch (err: any) {
+        // Silently fail for alerts - it's not critical
+        if (err.code !== 'ECONNABORTED') {
+          console.debug('Alerts check skipped');
+        }
       }
     };
 
@@ -79,7 +87,7 @@ function App() {
         <div className="content-area">
           <Routes>
             <Route path="/" element={<MapView />} />
-            <Route path="/devices" element={<MapView />} />
+            <Route path="/devices" element={<DevicesPage />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/alerts" element={<AlertsComponent />} />
             <Route path="/admin" element={<AdminPanel />} />

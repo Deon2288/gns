@@ -3,7 +3,6 @@ import axios from 'axios';
 import DeviceForm from './DeviceForm';
 import './MapContainer.css';
 
-// Dynamic import for mapbox-gl
 let mapboxgl: any;
 try {
     mapboxgl = require('mapbox-gl');
@@ -48,6 +47,7 @@ export const MapView: React.FC = () => {
     const map = useRef<any>(null);
     const markersRef = useRef<Map<number, any>>(new Map());
     const routeLinesRef = useRef<Map<number, string>>(new Map());
+    const sourceIdsRef = useRef<Set<string>>(new Set());
 
     const [devices, setDevices] = useState<DeviceLocation[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -111,7 +111,6 @@ export const MapView: React.FC = () => {
             setDevices(deviceLocations);
             setError(null);
 
-            // Update map markers
             if (map.current && deviceLocations.length > 0) {
                 updateMapMarkers(deviceLocations);
             }
@@ -130,18 +129,25 @@ export const MapView: React.FC = () => {
         markersRef.current.forEach((marker: any) => marker.remove());
         markersRef.current.clear();
 
-        // Remove old route lines
+        // Remove old route lines and sources
         routeLinesRef.current.forEach((lineId: string) => {
-            if (map.current?.getSource(lineId)) {
-                map.current.removeLayer(lineId);
-                map.current.removeSource(lineId);
+            try {
+                if (map.current?.getLayer(lineId)) {
+                    map.current.removeLayer(lineId);
+                }
+                const sourceId = `route-source-${lineId.split('-')[1]}`;
+                if (map.current?.getSource(sourceId)) {
+                    map.current.removeSource(sourceId);
+                }
+            } catch (e) {
+                console.warn('Error removing old route:', e);
             }
         });
         routeLinesRef.current.clear();
+        sourceIdsRef.current.clear();
 
-        // Add new markers and routes
         const bounds = new mapboxgl.LngLatBounds();
-        
+
         locations.forEach((device: DeviceLocation) => {
             if (device.latitude === 0 && device.longitude === 0) return;
 
@@ -178,31 +184,39 @@ export const MapView: React.FC = () => {
                 const lineId = `route-${device.device_id}`;
                 const sourceId = `route-source-${device.device_id}`;
 
-                map.current.addSource(sourceId, {
-                    type: 'geojson',
-                    data: {
-                        type: 'Feature',
-                        geometry: {
-                            type: 'LineString',
-                            coordinates: device.route.map(([lat, lng]) => [lng, lat])
-                        },
-                        properties: {}
-                    }
-                });
+                // Only add if not already exists
+                if (!sourceIdsRef.current.has(sourceId)) {
+                    try {
+                        map.current.addSource(sourceId, {
+                            type: 'geojson',
+                            data: {
+                                type: 'Feature',
+                                geometry: {
+                                    type: 'LineString',
+                                    coordinates: device.route.map(([lat, lng]) => [lng, lat])
+                                },
+                                properties: {}
+                            }
+                        });
 
-                map.current.addLayer({
-                    id: lineId,
-                    type: 'line',
-                    source: sourceId,
-                    paint: {
-                        'line-color': '#3b82f6',
-                        'line-width': 2,
-                        'line-opacity': 0.5,
-                        'line-dasharray': [4, 4]
-                    }
-                });
+                        map.current.addLayer({
+                            id: lineId,
+                            type: 'line',
+                            source: sourceId,
+                            paint: {
+                                'line-color': '#3b82f6',
+                                'line-width': 2,
+                                'line-opacity': 0.5,
+                                'line-dasharray': [4, 4]
+                            }
+                        });
 
-                routeLinesRef.current.set(device.device_id, lineId);
+                        sourceIdsRef.current.add(sourceId);
+                        routeLinesRef.current.set(device.device_id, lineId);
+                    } catch (e) {
+                        console.warn('Error adding route for device', device.device_id, e);
+                    }
+                }
             }
         });
 
@@ -372,10 +386,8 @@ export const MapView: React.FC = () => {
             )}
 
             <div style={{ display: 'flex', flex: 1, position: 'relative' }}>
-                {/* Map */}
                 <div ref={mapContainer} style={{ flex: 1, minHeight: '600px', background: '#f0f0f0' }} />
 
-                {/* Device List Sidebar */}
                 <div style={{
                     width: '350px',
                     background: '#f5f7fa',

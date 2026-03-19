@@ -1,1 +1,64 @@
-version: '3.8'\n\nservices:\n  backend:\n    image: your_backend_image\n    build: ./backend\n    ports:\n      - '8000:8000'\n    depends_on:\n      - postgres\n      - redis\n\n  frontend:\n    image: your_frontend_image\n    build: ./frontend\n    ports:\n      - '3000:3000'\n    depends_on:\n      - backend\n\n  postgres:\n    image: postgres:latest\n    environment:\n      POSTGRES_USER: postgres\n      POSTGRES_PASSWORD: password\n    volumes:\n      - postgres_data:/var/lib/postgresql/data\n\n  redis:\n    image: redis:latest\n\n  prometheus:\n    image: prom/prometheus\n    volumes:\n      - ./prometheus:/etc/prometheus\n    ports:\n      - '9090:9090'\n\n  grafana:\n    image: grafana/grafana\n    ports:\n      - '3001:3000'\n\nvolumes:\n  postgres_data:
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: gns-postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-gns_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secure_password}
+      POSTGRES_DB: ${DB_NAME:-gns_database}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - gns-network
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: gns-backend
+    depends_on:
+      - postgres
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-gns_user}
+      DB_PASSWORD: ${DB_PASSWORD:-secure_password}
+      DB_NAME: ${DB_NAME:-gns_database}
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    networks:
+      - gns-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: http://localhost:3001
+    container_name: gns-frontend
+    depends_on:
+      - backend
+    environment:
+      REACT_APP_API_URL: http://localhost:3001
+      REACT_APP_API_BASE_URL: http://localhost:3001/api
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    networks:
+      - gns-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  gns-network:
+    driver: bridge

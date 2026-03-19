@@ -26,10 +26,10 @@ export const AlertsComponent: React.FC = () => {
 
     const fetchAlerts = async () => {
         try {
-            const res = await axios.get('http://197.242.150.120:5000/api/alerts?limit=100');
+            const res = await axios.get('${REACT_APP_API_URL}/api/alerts?limit=100');
             
             // Enrich alerts with device names
-            const devicesRes = await axios.get('http://197.242.150.120:5000/api/devices');
+            const devicesRes = await axios.get('${REACT_APP_API_URL}/api/devices');
             const deviceMap = new Map(devicesRes.data.map((d: any) => [d.device_id, d.device_name]));
 
             const enrichedAlerts = res.data.map((alert: Alert) => ({

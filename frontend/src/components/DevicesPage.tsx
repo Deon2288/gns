@@ -35,7 +35,7 @@ export const DevicesPage: React.FC = () => {
     const [selectedDevice, setSelectedDevice] = useState<DeviceWithLocation | null>(null);
     const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
 
-    const API_BASE = 'http://197.242.150.120:5000';
+    const API_BASE = '${REACT_APP_API_URL}';
 
     useEffect(() => {
         fetchDevices();

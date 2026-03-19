@@ -40,7 +40,7 @@ interface DeviceLocation {
     route: [number, number][];
 }
 
-const API_BASE = 'http://197.242.150.120:5000';
+const API_BASE = '${REACT_APP_API_URL}';
 
 export const MapView: React.FC = () => {
     const mapContainer = useRef<HTMLDivElement>(null);

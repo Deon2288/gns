@@ -26,8 +26,8 @@ export const Dashboard: React.FC = () => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const devicesRes = await axios.get('http://197.242.150.120:5000/api/devices');
-                const gpsRes = await axios.get('http://197.242.150.120:5000/api/gps/latest?limit=1000');
+                const devicesRes = await axios.get('${REACT_APP_API_URL}/api/devices');
+                const gpsRes = await axios.get('${REACT_APP_API_URL}/api/gps/latest?limit=1000');
 
                 const totalDevices = devicesRes.data.length;
                 const activeDevices = devicesRes.data.filter((d: any) => {

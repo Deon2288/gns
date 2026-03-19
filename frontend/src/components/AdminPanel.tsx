@@ -40,7 +40,7 @@ export const AdminPanel: React.FC = () => {
 
     const fetchAdminData = async () => {
         try {
-            const devicesRes = await axios.get('http://197.242.150.120:5000/api/devices');
+            const devicesRes = await axios.get('${REACT_APP_API_URL}/api/devices');
             setDevices(devicesRes.data);
 
             // Calculate stats

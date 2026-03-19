@@ -21,7 +21,7 @@ export const AlertsPanel: React.FC = () => {
     useEffect(() => {
         const fetchAlerts = async () => {
             try {
-                const res = await axios.get('http://197.242.150.120:5000/api/alerts?limit=50');
+                const res = await axios.get('${REACT_APP_API_URL}/api/alerts?limit=50');
                 setAlerts(res.data);
                 setLoading(false);
             } catch (err) {

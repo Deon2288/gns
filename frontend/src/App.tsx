@@ -18,7 +18,7 @@ function App() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
-        const res = await axios.get('http://197.242.150.120:5000/api/alerts?limit=100', {
+        const res = await axios.get('${REACT_APP_API_URL}/api/alerts?limit=100', {
           signal: controller.signal
         });
         clearTimeout(timeoutId);

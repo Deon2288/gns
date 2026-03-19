@@ -30,7 +30,7 @@ const GPSMap: React.FC<GPSMapProps> = ({ devices }) => {
 
     const fetchGPSData = async () => {
         try {
-            const response = await fetch('http://197.242.150.120:5000/api/gps/latest');
+            const response = await fetch('${REACT_APP_API_URL}/api/gps/latest');
             if (!response.ok) throw new Error('Failed to fetch GPS data');
             const data = await response.json();
             setGpsData(data);
@@ -140,7 +140,7 @@ const GPSTestForm: React.FC<GPSTestFormProps> = ({ devices, onDataSent }) => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://197.242.150.120:5000/api/gps/update', {
+            const response = await fetch('${REACT_APP_API_URL}/api/gps/update', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),

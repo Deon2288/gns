@@ -1,0 +1,12 @@
+.header {
+    background-color: #4169E1; /* royal blue */
+    color: #2F4F4F; /* dark slate gray */
+}
+
+.header h1 {
+    color: #6A5ACD; /* slate blue */
+}
+
+.header p {
+    background-color: #B0C4DE; /* light steel blue */
+}

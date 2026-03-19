@@ -16,9 +16,37 @@ const analyticsRoutes = require('./routes/analytics');
 const teltonikaRoutes = require('./routes/teltonika');
 const usersRoutes = require('./routes/users');
 
+// CORS Configuration for Docker
+const corsOptions = {
+    origin: function (origin, callback) {
+        const allowedOrigins = [
+            'http://localhost:3000',
+            'http://localhost:3001',
+            'http://127.0.0.1:3000',
+            'http://127.0.0.1:3001',
+            'http://gns-frontend:3000',
+            'http://gns-frontend',
+            'http://gnnscloud.dedicated.co.za',
+            'https://gnnscloud.dedicated.co.za',
+        ];
+        
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    maxAge: 3600
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // PostgreSQL connection pool
 const pool = new Pool({
@@ -86,6 +114,7 @@ app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📊 Database: ${process.env.DB_NAME}`);
     console.log('✅ All routes loaded');
+    console.log('🔐 CORS enabled for Docker containers');
 });
 
 module.exports = app;

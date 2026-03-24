@@ -1,0 +1,338 @@
+/* ── MapContainer layout ────────────────────────────────────────────────── */
+
+.map-view-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 80vh;
+    font-family: inherit;
+}
+
+/* Header */
+.map-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: #1e293b;
+    color: #f1f5f9;
+    border-bottom: 2px solid #334155;
+    flex-shrink: 0;
+}
+
+.map-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.map-header-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.refresh-info {
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+.btn-refresh {
+    padding: 0.35rem 0.9rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background 0.2s;
+    background: #2563eb;
+    color: #fff;
+}
+
+.btn-refresh:hover {
+    background: #1d4ed8;
+}
+
+/* Body: map + sidebar side by side */
+.map-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* ── Leaflet map area ─────────────────────────────────────────────────────── */
+
+.map-wrapper {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    min-height: 500px;
+}
+
+.leaflet-map {
+    width: 100%;
+    height: 100%;
+    min-height: 500px;
+}
+
+.map-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: 1rem;
+    color: #64748b;
+    background: #f8fafc;
+}
+
+/* ── Custom circular marker ────────────────────────────────────────────── */
+
+.gns-marker {
+    display: block;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Marker popup ────────────────────────────────────────────────────────── */
+
+.marker-popup h4 {
+    margin: 0 0 0.4rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.marker-popup p {
+    margin: 0.2rem 0;
+    font-size: 0.82rem;
+    color: #334155;
+}
+
+.marker-popup .status-active {
+    color: #16a34a;
+    font-weight: 600;
+    margin-top: 0.4rem;
+}
+
+.marker-popup .status-idle {
+    color: #ca8a04;
+    font-weight: 600;
+    margin-top: 0.4rem;
+}
+
+.btn-delete-popup {
+    margin-top: 0.6rem;
+    padding: 0.3rem 0.75rem;
+    background: #dc2626;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn-delete-popup:hover {
+    background: #b91c1c;
+}
+
+/* ── Map legend ──────────────────────────────────────────────────────────── */
+
+.map-legend {
+    position: absolute;
+    bottom: 2rem;
+    right: 0.75rem;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 8px;
+    padding: 0.6rem 0.9rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    color: #1e293b;
+}
+
+.map-legend h5 {
+    margin: 0 0 0.3rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.map-legend span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.legend-dot {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+}
+
+/* ── Device sidebar ─────────────────────────────────────────────────────── */
+
+.device-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    background: #f8fafc;
+    border-left: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.device-sidebar h3 {
+    margin: 0;
+    padding: 0.85rem 1rem;
+    background: #f1f5f9;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.device-count {
+    background: #2563eb;
+    color: #fff;
+    border-radius: 12px;
+    padding: 0.1rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.sidebar-loading,
+.sidebar-empty {
+    padding: 1rem;
+    color: #64748b;
+    font-size: 0.88rem;
+}
+
+.device-list {
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.device-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.7rem 0.85rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    transition: box-shadow 0.2s;
+}
+
+.device-card:hover {
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.device-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.4rem;
+}
+
+.device-name {
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: #1e293b;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 160px;
+}
+
+.device-status {
+    font-size: 0.72rem;
+    font-weight: 700;
+    border-radius: 10px;
+    padding: 0.15rem 0.55rem;
+    flex-shrink: 0;
+}
+
+.device-status.active {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.device-status.idle {
+    background: #fef9c3;
+    color: #854d0e;
+}
+
+.device-card-body p {
+    margin: 0.15rem 0;
+    font-size: 0.78rem;
+    color: #475569;
+}
+
+.device-card-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+}
+
+.btn-delete {
+    padding: 0.25rem 0.65rem;
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fca5a5;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: background 0.2s, color 0.2s;
+}
+
+.btn-delete:hover {
+    background: #dc2626;
+    color: #fff;
+}
+
+/* ── Responsive: stack on small screens ─────────────────────────────────── */
+
+@media (max-width: 768px) {
+    .map-body {
+        flex-direction: column;
+    }
+
+    .map-wrapper {
+        min-height: 350px;
+        height: 55vw;
+    }
+
+    .device-sidebar {
+        width: 100%;
+        max-height: 260px;
+        border-left: none;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .map-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
